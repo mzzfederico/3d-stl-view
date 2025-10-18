@@ -1,0 +1,122 @@
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Project } from '../schemas/project.schema';
+
+@Injectable()
+export class ProjectService {
+  constructor(
+    @InjectModel(Project.name) private projectModel: Model<Project>,
+  ) {}
+
+  async listProjects(): Promise<Project[]> {
+    return this.projectModel
+      .find()
+      .select('projectId projectName createdAt updatedAt')
+      .exec();
+  }
+
+  async getProject(projectId: string): Promise<Project | null> {
+    return this.projectModel.findOne({ projectId }).exec();
+  }
+
+  async createProject(projectName: string): Promise<{ projectId: string }> {
+    const projectId = Math.random().toString(36).substring(2, 15);
+
+    const project = new this.projectModel({
+      projectId,
+      projectName,
+      chatLog: [],
+      annotations: [],
+      camera: {
+        position: { x: 0, y: 0, z: 5 },
+        rotation: { x: 0, y: 0, z: 0 },
+      },
+    });
+
+    await project.save();
+
+    return { projectId };
+  }
+
+  async uploadSTL(
+    projectId: string,
+    stlFile: string,
+  ): Promise<{ success: boolean }> {
+    const result = await this.projectModel
+      .updateOne({ projectId }, { $set: { stlFile } })
+      .exec();
+
+    return { success: result.modifiedCount > 0 };
+  }
+
+  async addChatMessage(
+    projectId: string,
+    userId: string,
+    message: string,
+  ): Promise<{ success: boolean }> {
+    const result = await this.projectModel
+      .updateOne(
+        { projectId },
+        {
+          $push: {
+            chatLog: {
+              userId,
+              message,
+              timestamp: new Date(),
+            },
+          },
+        },
+      )
+      .exec();
+
+    return { success: result.modifiedCount > 0 };
+  }
+
+  async addAnnotation(
+    projectId: string,
+    userId: string,
+    text: string,
+    vertex: { x: number; y: number; z: number },
+  ): Promise<{ success: boolean }> {
+    const result = await this.projectModel
+      .updateOne(
+        { projectId },
+        {
+          $push: {
+            annotations: {
+              text,
+              userId,
+              vertex,
+              timestamp: new Date(),
+            },
+          },
+        },
+      )
+      .exec();
+
+    return { success: result.modifiedCount > 0 };
+  }
+
+  async updateCamera(
+    projectId: string,
+    position: { x: number; y: number; z: number },
+    rotation: { x: number; y: number; z: number },
+  ): Promise<{ success: boolean }> {
+    const result = await this.projectModel
+      .updateOne(
+        { projectId },
+        {
+          $set: {
+            camera: {
+              position,
+              rotation,
+            },
+          },
+        },
+      )
+      .exec();
+
+    return { success: result.modifiedCount > 0 };
+  }
+}
