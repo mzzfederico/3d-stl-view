@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Project } from '../schemas/project.schema';
+import { Project, Vector3 } from '../schemas/project.schema';
 import { EventsService } from './events.service';
 
 @Injectable()
@@ -32,6 +32,11 @@ export class ProjectService {
       annotations: [],
       camera: {
         position: { x: 0, y: 0, z: 5 },
+        rotation: { x: 0, y: 0, z: 0 },
+      },
+      modelTransform: {
+        origin: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
         rotation: { x: 0, y: 0, z: 0 },
       },
     });
@@ -147,6 +152,39 @@ export class ProjectService {
       this.eventsService.emitProjectUpdate({
         projectId,
         type: 'camera',
+        timestamp: new Date(),
+      });
+    }
+
+    return { success: result.modifiedCount > 0 };
+  }
+
+  async updateModelTransform(
+    projectId: string,
+    origin?: { x: number; y: number; z: number },
+    scale?: { x: number; y: number; z: number },
+    rotation?: { x: number; y: number; z: number },
+  ): Promise<{ success: boolean }> {
+    const updateFields: Record<string, Vector3> = {};
+
+    if (origin) {
+      updateFields['modelTransform.origin'] = origin;
+    }
+    if (scale) {
+      updateFields['modelTransform.scale'] = scale;
+    }
+    if (rotation) {
+      updateFields['modelTransform.rotation'] = rotation;
+    }
+
+    const result = await this.projectModel
+      .updateOne({ projectId }, { $set: updateFields })
+      .exec();
+
+    if (result.modifiedCount > 0) {
+      this.eventsService.emitProjectUpdate({
+        projectId,
+        type: 'modelTransform',
         timestamp: new Date(),
       });
     }

@@ -54,7 +54,11 @@ export default function ThreeScene({ projectId }: ThreeSceneProps) {
         <directionalLight position={[-10, -10, -5]} intensity={0.3} />
 
         {/* STL Model */}
-        <STLModel stlData={project.stlFile} />
+        <STLModel
+          stlData={project.stlFile}
+          projectId={projectId}
+          modelTransform={project.modelTransform}
+        />
 
         {/* Grid helper */}
         <Grid

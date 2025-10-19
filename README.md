@@ -79,7 +79,8 @@ pnpm run lint            # ESLint
 
 - **Framework**: Next.js with App Router
 - **UI Components**: shadcn/ui components
-- **3D Rendering**: React Three Fiber for STL model viewing
+- **3D Rendering**: React Three Fiber for STL model viewing with PivotControls for model transformation
+- **Mode System**: Context-based mode switching between Transform and Note modes
 - **Key Pages**:
   - `/login` - Name-only authentication
   - `/projects` - List all projects
@@ -116,10 +117,42 @@ Each project is stored as a document with:
     position: { x: number; y: number; z: number };
     rotation: { x: number; y: number; z: number };
   };
+  modelTransform: {
+    origin: { x: number; y: number; z: number };
+    scale: { x: number; y: number; z: number };
+    rotation: { x: number; y: number; z: number };
+  };
   createdAt: Date;
   updatedAt: Date;
 }
 ```
+
+## Features
+
+### 3D Model Transformation
+
+The application supports interactive 3D model transformation with persistent storage:
+
+- **Transform Controls**: PivotControls from `@react-three/drei` provide intuitive gizmos for manipulating models
+- **Transformations**: Origin (position), scale, and rotation are stored per-project
+- **Mode System**:
+  - **Transform Mode**: Shows PivotControls gizmo for moving/scaling the model
+  - **Note Mode**: Hides transform controls and shows nearest vertex indicator for annotations
+- **Real-time Updates**: Model transformations are saved to MongoDB and broadcast to all collaborators
+- **Debounced Updates**: 500ms debounce prevents excessive server requests during manipulation
+
+**Implementation Details:**
+
+- `ModelTransformController`: Wraps the 3D model and manages PivotControls based on current mode
+- `useModelTransformUpdate`: Hook for debounced transformation updates with optimistic UI
+- `useGeometryVertex`: Calculates vertex positions accounting for model transformations
+- `useMouseNearbyVertices`: Finds nearest vertex to mouse cursor in world space
+
+### Annotation System
+
+- **Vertex Detection**: Hover over the model to highlight nearby vertices
+- **Mode-based UI**: Vertex indicators only visible in Note mode to avoid clutter during transformations
+- **World Space Calculation**: Vertex positions correctly account for model transformations
 
 ## Real-time Collaboration
 
@@ -199,6 +232,7 @@ User Action (chat/annotation/camera/STL)
 - `projects.addChatMessage` - Add message to chat log
 - `projects.addAnnotation` - Add annotation to 3D model
 - `projects.updateCamera` - Update camera position/rotation
+- `projects.updateModelTransform` - Update model origin, scale, and rotation
 
 ### WebSocket Events
 
@@ -211,7 +245,7 @@ User Action (chat/annotation/camera/STL)
     ```typescript
     {
       projectId: string;
-      type: 'chat' | 'annotation' | 'camera' | 'stl';
+      type: 'chat' | 'annotation' | 'camera' | 'stl' | 'modelTransform';
       timestamp: Date;
     }
     ```
@@ -240,14 +274,24 @@ User Action (chat/annotation/camera/STL)
 │   ├── app/
 │   │   ├── project/[id]/
 │   │   │   ├── components/
-│   │   │   │   ├── CameraController.tsx
-│   │   │   │   ├── ThreeScene.tsx
-│   │   │   │   └── Chat.tsx
+│   │   │   │   ├── Chat.tsx
+│   │   │   │   ├── ModelTransformController.tsx
+│   │   │   │   ├── STLDropzone.tsx
+│   │   │   │   ├── STLModel.tsx
+│   │   │   │   └── ThreeScene.tsx
+│   │   │   ├── hooks/
+│   │   │   │   ├── useCameraUpdate.ts
+│   │   │   │   ├── useChatMessage.ts
+│   │   │   │   ├── useConvertBinaryIntoGeometry.ts
+│   │   │   │   ├── useGeometryVertex.ts
+│   │   │   │   ├── useModelTransformUpdate.ts
+│   │   │   │   └── useMouseNearbyVertices.ts
 │   │   │   └── page.tsx
 │   │   └── projects/
 │   ├── lib/
+│   │   ├── context/
+│   │   │   └── useModes.tsx         # Mode context (Transform/Note)
 │   │   ├── hooks/
-│   │   │   ├── useCameraUpdate.ts
 │   │   │   ├── useProjectData.ts
 │   │   │   └── useProjectSubscription.ts
 │   │   └── trpc/

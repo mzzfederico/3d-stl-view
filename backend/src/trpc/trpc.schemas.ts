@@ -50,6 +50,31 @@ export const updateCameraSchema = z.object({
   }),
 });
 
+export const updateModelTransformSchema = z.object({
+  projectId: z.string(),
+  origin: z
+    .object({
+      x: z.number(),
+      y: z.number(),
+      z: z.number(),
+    })
+    .optional(),
+  scale: z
+    .object({
+      x: z.number(),
+      y: z.number(),
+      z: z.number(),
+    })
+    .optional(),
+  rotation: z
+    .object({
+      x: z.number(),
+      y: z.number(),
+      z: z.number(),
+    })
+    .optional(),
+});
+
 export const checkProjectUpdatesSchema = z.object({
   projectId: z.string(),
   since: z.date().optional(), // Timestamp of last update check

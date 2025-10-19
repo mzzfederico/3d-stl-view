@@ -30,14 +30,19 @@ export function useMouseNearbyVertices({
 
       for (let i = 0; i < vertices.length; i++) {
         const vertex = vertices[i];
-        const { x: x1, y: y1, z: z1 } = vertex;
+
+        // Transform vertex to world space
+        const worldVertex = vertex.clone();
+        mesh.localToWorld(worldVertex);
+
+        const { x: x1, y: y1, z: z1 } = worldVertex;
         const distance = Math.sqrt(
           Math.pow(x1 - x0, 2) + Math.pow(y1 - y0, 2) + Math.pow(z1 - z0, 2),
         );
 
         if (distance < minDistance) {
           minDistance = distance;
-          nearestVertex = vertex;
+          nearestVertex = vertex; // Return the original local space vertex
         }
       }
 

@@ -1,10 +1,12 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import ThreeScene from "./components/ThreeScene";
-import Chat from "./components/Chat";
-import { Suspense } from "react";
+import { ModeProvider } from "@/lib/context/useModes";
 import { useProjectSubscription } from "@/lib/hooks/useProjectSubscription";
+import { useParams } from "next/navigation";
+import { Suspense } from "react";
+import Chat from "./components/Chat";
+import Commands from "./components/Commands";
+import ThreeScene from "./components/ThreeScene";
 
 export default function ProjectPage() {
   const { id } = useParams<{ id: string }>();
@@ -13,11 +15,14 @@ export default function ProjectPage() {
   useProjectSubscription(id);
 
   return (
-    <Suspense>
-      <div className="flex h-screen w-full">
-        <Chat projectId={id} />
-        <ThreeScene projectId={id} />
-      </div>
-    </Suspense>
+    <ModeProvider>
+      <Suspense>
+        <div className="flex h-screen w-full">
+          <Chat projectId={id} />
+          <ThreeScene projectId={id} />
+        </div>
+        <Commands />
+      </Suspense>
+    </ModeProvider>
   );
 }

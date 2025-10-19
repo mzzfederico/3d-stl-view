@@ -57,6 +57,20 @@ export class Camera {
 
 const CameraSchema = SchemaFactory.createForClass(Camera);
 
+@Schema({ _id: false })
+export class ModelTransform {
+  @Prop({ type: Vector3Schema, required: true, default: { x: 0, y: 0, z: 0 } })
+  origin: Vector3;
+
+  @Prop({ type: Vector3Schema, required: true, default: { x: 1, y: 1, z: 1 } })
+  scale: Vector3;
+
+  @Prop({ type: Vector3Schema, required: true, default: { x: 0, y: 0, z: 0 } })
+  rotation: Vector3;
+}
+
+const ModelTransformSchema = SchemaFactory.createForClass(ModelTransform);
+
 @Schema({ timestamps: true })
 export class Project extends Document {
   @Prop({ required: true, unique: true })
@@ -76,6 +90,9 @@ export class Project extends Document {
 
   @Prop({ type: CameraSchema })
   camera: Camera;
+
+  @Prop({ type: ModelTransformSchema })
+  modelTransform: ModelTransform;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);

@@ -8,6 +8,7 @@ import {
   addChatMessageSchema,
   addAnnotationSchema,
   updateCameraSchema,
+  updateModelTransformSchema,
 } from './trpc.schemas';
 import { UserService } from '../services/user.service';
 import { ProjectService } from '../services/project.service';
@@ -73,6 +74,18 @@ export class ProjectsRouter {
     return this.projectService.updateCamera(
       input.projectId,
       input.position,
+      input.rotation,
+    );
+  }
+
+  @Mutation({ input: updateModelTransformSchema })
+  async updateModelTransform(
+    @Input() input: z.infer<typeof updateModelTransformSchema>,
+  ) {
+    return this.projectService.updateModelTransform(
+      input.projectId,
+      input.origin,
+      input.scale,
       input.rotation,
     );
   }

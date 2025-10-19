@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 
 export interface ProjectUpdateEvent {
   projectId: string;
-  type: 'chat' | 'annotation' | 'camera' | 'stl';
+  type: 'chat' | 'annotation' | 'camera' | 'stl' | 'modelTransform';
   timestamp: Date;
 }
 
