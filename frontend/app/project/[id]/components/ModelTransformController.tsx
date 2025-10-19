@@ -5,6 +5,7 @@ import { Mesh, Euler, Vector3, Matrix4, Quaternion } from "three";
 import { PivotControls } from "@react-three/drei";
 import { useModelTransformUpdate } from "../hooks/useModelTransformUpdate";
 import { useMode, MODES } from "@/lib/context/useModes";
+import { vec3, euler } from "@/lib/three-utils";
 
 interface ModelTransformControllerProps {
   meshRef: React.RefObject<Mesh | null>;
@@ -53,21 +54,9 @@ export default function ModelTransformController({
   // Create initial matrix from modelTransform
   const initialMatrix = new Matrix4();
   if (modelTransform) {
-    const pos = new Vector3(
-      modelTransform.origin.x,
-      modelTransform.origin.y,
-      modelTransform.origin.z,
-    );
-    const rot = new Euler(
-      modelTransform.rotation.x,
-      modelTransform.rotation.y,
-      modelTransform.rotation.z,
-    );
-    const scl = new Vector3(
-      modelTransform.scale.x,
-      modelTransform.scale.y,
-      modelTransform.scale.z,
-    );
+    const pos = vec3(modelTransform.origin);
+    const rot = euler(modelTransform.rotation);
+    const scl = vec3(modelTransform.scale);
     initialMatrix.compose(pos, new Quaternion().setFromEuler(rot), scl);
   }
 

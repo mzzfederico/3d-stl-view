@@ -6,10 +6,10 @@ import { Grid, OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Euler, Vector3 } from "three";
 import { useCameraUpdate } from "../hooks/useCameraUpdate";
 import STLDropzone from "./STLDropzone";
 import STLModel from "./STLModel";
+import { vec3, euler } from "@/lib/three-utils";
 
 interface ThreeSceneProps {
   projectId: Project["id"];
@@ -32,20 +32,8 @@ export default function ThreeScene({ projectId }: ThreeSceneProps) {
       <Canvas className="w-full h-full">
         <PerspectiveCamera
           makeDefault
-          position={
-            new Vector3(
-              project.camera.position.x,
-              project.camera.position.y,
-              project.camera.position.z,
-            )
-          }
-          rotation={
-            new Euler(
-              project.camera.rotation.x,
-              project.camera.rotation.y,
-              project.camera.rotation.z,
-            )
-          }
+          position={vec3(project.camera.position)}
+          rotation={euler(project.camera.rotation)}
         />
 
         {/* Lighting */}

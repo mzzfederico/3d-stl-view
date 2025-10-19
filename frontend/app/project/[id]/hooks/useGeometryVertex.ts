@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { BufferGeometry, Vector3, Matrix4, Euler, Quaternion } from "three";
+import { BufferGeometry, Vector3, Matrix4, Quaternion } from "three";
+import { vec3, euler } from "@/lib/three-utils";
 
 interface ModelTransform {
   origin: { x: number; y: number; z: number };
@@ -9,7 +10,7 @@ interface ModelTransform {
 
 export default function useGeometryVertex(
   geometry: BufferGeometry | null,
-  modelTransform?: ModelTransform
+  modelTransform?: ModelTransform,
 ) {
   return useMemo(() => {
     if (!geometry) return [];
@@ -20,21 +21,9 @@ export default function useGeometryVertex(
     // Create transformation matrix from modelTransform
     const transformMatrix = new Matrix4();
     if (modelTransform) {
-      const pos = new Vector3(
-        modelTransform.origin.x,
-        modelTransform.origin.y,
-        modelTransform.origin.z
-      );
-      const rot = new Euler(
-        modelTransform.rotation.x,
-        modelTransform.rotation.y,
-        modelTransform.rotation.z
-      );
-      const scl = new Vector3(
-        modelTransform.scale.x,
-        modelTransform.scale.y,
-        modelTransform.scale.z
-      );
+      const pos = vec3(modelTransform.origin);
+      const rot = euler(modelTransform.rotation);
+      const scl = vec3(modelTransform.scale);
       transformMatrix.compose(pos, new Quaternion().setFromEuler(rot), scl);
     }
 
@@ -45,7 +34,7 @@ export default function useGeometryVertex(
     ) {
       const vertex = new Vector3().fromBufferAttribute(
         positionAttribute,
-        vertexIndex
+        vertexIndex,
       );
 
       // Apply transformation if modelTransform is provided
