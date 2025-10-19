@@ -30,7 +30,9 @@ export class ProjectService {
     // Collect all unique userIds from chatLog and annotations
     const userIds = new Set<string>();
     project.chatLog?.forEach((log) => userIds.add(log.userId));
-    project.annotations?.forEach((annotation) => userIds.add(annotation.userId));
+    project.annotations?.forEach((annotation) =>
+      userIds.add(annotation.userId),
+    );
 
     // Fetch user names for all userIds
     const userMap = await this.userService.getUsersByIds(Array.from(userIds));
@@ -46,10 +48,12 @@ export class ProjectService {
     }
 
     if (projectWithNames.annotations) {
-      projectWithNames.annotations = projectWithNames.annotations.map((annotation) => ({
-        ...annotation,
-        userName: userMap.get(annotation.userId) || annotation.userId,
-      }));
+      projectWithNames.annotations = projectWithNames.annotations.map(
+        (annotation) => ({
+          ...annotation,
+          userName: userMap.get(annotation.userId) || annotation.userId,
+        }),
+      );
     }
 
     return projectWithNames;

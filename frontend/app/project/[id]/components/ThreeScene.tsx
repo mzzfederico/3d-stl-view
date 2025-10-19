@@ -26,10 +26,10 @@ export default function ThreeScene({ projectId }: ThreeSceneProps) {
   const { updateCamera } = useCameraUpdate(projectId);
 
   return (
-    <div className="flex-1 bg-gray-900 relative">
+    <div className="absolute inset-0 bg-gray-900">
       <STLDropzone projectId={projectId} hasSTL={!!project.stlFile} />
 
-      <Canvas className="absolute inset-0 z-0">
+      <Canvas className="w-full h-full">
         <PerspectiveCamera
           makeDefault
           position={

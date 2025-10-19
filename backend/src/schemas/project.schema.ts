@@ -25,6 +25,8 @@ export class ChatMessage {
 
   @Prop({ required: true, default: () => new Date() })
   timestamp: Date;
+
+  userName?: string;
 }
 
 const ChatMessageSchema = SchemaFactory.createForClass(ChatMessage);
@@ -42,6 +44,8 @@ export class Annotation {
 
   @Prop({ required: true, default: () => new Date() })
   timestamp: Date;
+
+  userName?: string;
 }
 
 const AnnotationSchema = SchemaFactory.createForClass(Annotation);
