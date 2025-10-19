@@ -1,13 +1,15 @@
 "use client";
 
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Grid, PerspectiveCamera } from "@react-three/drei";
 import { useProjectData } from "@/lib/hooks/useProjectData";
-import { useCameraUpdate } from "@/lib/hooks/useCameraUpdate";
-import { useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Euler, Vector3 } from "three";
 import { Project } from "@backend/schemas/project.schema";
+import { Grid, OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { Euler, Vector3 } from "three";
+import { useCameraUpdate } from "../hooks/useCameraUpdate";
+import STLDropzone from "./STLDropzone";
+import STLModel from "./STLModel";
 
 interface ThreeSceneProps {
   projectId: Project["id"];
@@ -20,12 +22,14 @@ export default function ThreeScene({ projectId }: ThreeSceneProps) {
     if (!projectId) router.push("/not-found");
   });
 
-  const { project, query } = useProjectData(projectId);
+  const { project } = useProjectData(projectId);
   const { updateCamera } = useCameraUpdate(projectId);
 
   return (
-    <div className="flex-1 bg-gray-900">
-      <Canvas>
+    <div className="flex-1 bg-gray-900 relative">
+      <STLDropzone projectId={projectId} hasSTL={!!project.stlFile} />
+
+      <Canvas className="absolute inset-0 z-0">
         <PerspectiveCamera
           makeDefault
           position={
@@ -49,11 +53,8 @@ export default function ThreeScene({ projectId }: ThreeSceneProps) {
         <directionalLight position={[10, 10, 5]} intensity={1} />
         <directionalLight position={[-10, -10, -5]} intensity={0.3} />
 
-        {/* Placeholder 3D object - a simple box */}
-        <mesh>
-          <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color="orange" />
-        </mesh>
+        {/* STL Model */}
+        <STLModel stlData={project.stlFile} />
 
         {/* Grid helper */}
         <Grid

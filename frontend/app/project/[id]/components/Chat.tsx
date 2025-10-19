@@ -1,7 +1,6 @@
-import { useChatMessage } from "@/lib/hooks/useChatMessage";
-import { useProjectData } from "@/lib/hooks/useProjectData";
-import { useParams } from "next/navigation";
 import { useState } from "react";
+import { useChatMessage } from "../hooks/useChatMessage";
+import { useProjectData } from "@/lib/hooks/useProjectData";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Project } from "@backend/schemas/project.schema";

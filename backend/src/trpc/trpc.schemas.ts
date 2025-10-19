@@ -49,3 +49,8 @@ export const updateCameraSchema = z.object({
     z: z.number(),
   }),
 });
+
+export const checkProjectUpdatesSchema = z.object({
+  projectId: z.string(),
+  since: z.date().optional(), // Timestamp of last update check
+});

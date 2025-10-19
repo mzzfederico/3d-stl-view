@@ -1,5 +1,5 @@
 import { useRef, useCallback } from "react";
-import { trpc } from "../trpc/client";
+import { trpc } from "@/lib/trpc/client";
 import { Project } from "@backend/schemas/project.schema";
 
 interface CameraPosition {

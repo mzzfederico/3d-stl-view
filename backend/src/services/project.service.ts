@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Project } from '../schemas/project.schema';
+import { EventsService } from './events.service';
 
 @Injectable()
 export class ProjectService {
   constructor(
     @InjectModel(Project.name) private projectModel: Model<Project>,
+    private eventsService: EventsService,
   ) {}
 
   async listProjects(): Promise<Project[]> {
@@ -47,6 +49,14 @@ export class ProjectService {
       .updateOne({ projectId }, { $set: { stlFile } })
       .exec();
 
+    if (result.modifiedCount > 0) {
+      this.eventsService.emitProjectUpdate({
+        projectId,
+        type: 'stl',
+        timestamp: new Date(),
+      });
+    }
+
     return { success: result.modifiedCount > 0 };
   }
 
@@ -69,6 +79,14 @@ export class ProjectService {
         },
       )
       .exec();
+
+    if (result.modifiedCount > 0) {
+      this.eventsService.emitProjectUpdate({
+        projectId,
+        type: 'chat',
+        timestamp: new Date(),
+      });
+    }
 
     return { success: result.modifiedCount > 0 };
   }
@@ -95,6 +113,14 @@ export class ProjectService {
       )
       .exec();
 
+    if (result.modifiedCount > 0) {
+      this.eventsService.emitProjectUpdate({
+        projectId,
+        type: 'annotation',
+        timestamp: new Date(),
+      });
+    }
+
     return { success: result.modifiedCount > 0 };
   }
 
@@ -116,6 +142,14 @@ export class ProjectService {
         },
       )
       .exec();
+
+    if (result.modifiedCount > 0) {
+      this.eventsService.emitProjectUpdate({
+        projectId,
+        type: 'camera',
+        timestamp: new Date(),
+      });
+    }
 
     return { success: result.modifiedCount > 0 };
   }

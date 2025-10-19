@@ -1,11 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TrpcModule } from './trpc/trpc.module';
 import { User, UserSchema } from './schemas/user.schema';
 import { Project, ProjectSchema } from './schemas/project.schema';
-import { ProjectService } from './services/project.service';
+import { ProjectGateway } from './gateways/project.gateway';
 
 @Module({
   imports: [
@@ -19,7 +17,7 @@ import { ProjectService } from './services/project.service';
     ]),
     TrpcModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, ProjectService],
+  controllers: [],
+  providers: [ProjectGateway],
 })
 export class AppModule {}
