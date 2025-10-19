@@ -16,11 +16,11 @@ export class ProjectService {
   async listProjects(): Promise<Project[]> {
     return this.projectModel
       .find()
-      .select('projectId projectName createdAt updatedAt')
+      .select('projectId title createdAt updatedAt')
       .exec();
   }
 
-  async getProject(projectId: string): Promise<any> {
+  async getProject(projectId: string): Promise<Project | null> {
     const project = await this.projectModel.findOne({ projectId }).exec();
 
     if (!project) {
@@ -59,12 +59,12 @@ export class ProjectService {
     return projectWithNames;
   }
 
-  async createProject(projectName: string): Promise<{ projectId: string }> {
+  async createProject(title: string): Promise<{ projectId: string }> {
     const projectId = Math.random().toString(36).substring(2, 15);
 
     const project = new this.projectModel({
       projectId,
-      projectName,
+      title,
       chatLog: [],
       annotations: [],
       camera: {
@@ -81,6 +81,27 @@ export class ProjectService {
     await project.save();
 
     return { projectId };
+  }
+
+  async updateProjectTitle(
+    projectId: string,
+    title: string,
+    userId?: string,
+  ): Promise<{ success: boolean }> {
+    const result = await this.projectModel
+      .updateOne({ projectId }, { $set: { title } })
+      .exec();
+
+    if (result.modifiedCount > 0) {
+      this.eventsService.emitProjectUpdate({
+        projectId,
+        type: 'stl',
+        timestamp: new Date(),
+        userId,
+      });
+    }
+
+    return { success: result.modifiedCount > 0 };
   }
 
   async uploadSTL(

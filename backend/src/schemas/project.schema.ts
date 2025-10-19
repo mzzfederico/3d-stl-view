@@ -80,8 +80,8 @@ export class Project extends Document {
   @Prop({ required: true, unique: true })
   projectId: string;
 
-  @Prop({ required: true })
-  projectName: string;
+  @Prop({ required: true, default: 'Untitled Project' })
+  title: string;
 
   @Prop({ type: String })
   stlFile: string; // Base64 encoded STL file

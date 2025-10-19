@@ -4,6 +4,7 @@ import {
   createUserSchema,
   getProjectSchema,
   createProjectSchema,
+  updateProjectTitleSchema,
   uploadSTLSchema,
   addChatMessageSchema,
   addAnnotationSchema,
@@ -42,12 +43,25 @@ export class ProjectsRouter {
 
   @Mutation({ input: createProjectSchema })
   async create(@Input() input: z.infer<typeof createProjectSchema>) {
-    return this.projectService.createProject(input.projectName);
+    return this.projectService.createProject(input.title);
+  }
+
+  @Mutation({ input: updateProjectTitleSchema })
+  async updateTitle(@Input() input: z.infer<typeof updateProjectTitleSchema>) {
+    return this.projectService.updateProjectTitle(
+      input.projectId,
+      input.title,
+      input.userId,
+    );
   }
 
   @Mutation({ input: uploadSTLSchema })
   async uploadSTL(@Input() input: z.infer<typeof uploadSTLSchema>) {
-    return this.projectService.uploadSTL(input.projectId, input.stlFile, input.userId);
+    return this.projectService.uploadSTL(
+      input.projectId,
+      input.stlFile,
+      input.userId,
+    );
   }
 
   @Mutation({ input: addChatMessageSchema })

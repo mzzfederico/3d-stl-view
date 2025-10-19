@@ -6,7 +6,6 @@ import {
   OnGatewayDisconnect,
   SubscribeMessage,
   MessageBody,
-  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
@@ -37,11 +36,11 @@ export class UserGateway
     Logger.log(`Client connected: ${client.id}`);
 
     // Check if client is reconnecting with existing userId
-    const existingUserId = client.handshake.auth?.userId;
+    const existingUserId = (client.handshake.auth?.userId as string) ?? null;
     const userId = existingUserId || this.generateUserId();
 
     // Store userId in socket data and our map
-    client.data.userId = userId;
+    (client.data as Record<string, string>).userId = userId;
     this.socketUserMap.set(client.id, userId);
 
     // Send userId back to client
@@ -58,7 +57,6 @@ export class UserGateway
   @SubscribeMessage('setUserName')
   async handleSetUserName(
     @MessageBody() data: { userId: string; userName: string },
-    @ConnectedSocket() client: Socket,
   ) {
     const { userId, userName } = data;
     Logger.log(`Setting userName for ${userId}: ${userName}`);

@@ -1,6 +1,6 @@
 import { useThree } from "@react-three/fiber";
 import { useState, useEffect, useRef } from "react";
-import { Vector2, Vector3, Raycaster, Camera, Mesh } from "three";
+import { Vector2, Vector3, Raycaster, Mesh } from "three";
 
 interface UseMouseNearbyVerticesOptions {
   vertices: Vector3[];

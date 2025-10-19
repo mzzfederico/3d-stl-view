@@ -7,7 +7,6 @@ import { SOCKET_URL } from "../constants";
 
 interface ProjectSubscriptionOptions {
   userId?: string | null;
-  onCameraUpdate?: () => void;
 }
 
 export function useProjectSubscription(
@@ -26,20 +25,13 @@ export function useProjectSubscription(
       console.log("WebSocket connected:", socket.id);
       socket.emit("subscribeToProject", {
         projectId,
-        userId: options?.userId || undefined
+        userId: options?.userId || undefined,
       });
     });
 
     socket.on(
       "projectUpdate",
       (data: { projectId: string; type: string; timestamp: Date }) => {
-        console.log("Project update received:", data);
-
-        // Call camera update callback if it's a camera update
-        if (data.type === "camera" && options?.onCameraUpdate) {
-          options.onCameraUpdate();
-        }
-
         utils.projects.get.invalidate({ projectId });
       },
     );

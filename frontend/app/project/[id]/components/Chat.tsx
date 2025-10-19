@@ -1,20 +1,23 @@
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useChatMessage } from "../hooks/useChatMessage";
 import { useProjectData } from "@/lib/hooks/useProjectData";
-import { useUserIdContext } from "@/lib/context/UserIdContext";
+import { useUserContext } from "@/lib/context/UserContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Project } from "@backend/schemas/project.schema";
-import { PanelLeftClose } from "lucide-react";
+import { PanelLeftClose, ArrowLeft } from "lucide-react";
+import { useParams } from "next/navigation";
 
 interface ChatProps {
-  projectId: Project["id"];
   onClose?: () => void;
 }
 
-export default function Chat({ projectId, onClose }: ChatProps) {
+export default function Chat({ onClose }: ChatProps) {
+  const router = useRouter();
+  const { id: projectId } = useParams<{ id: string }>();
+
   const { project, query } = useProjectData(projectId);
-  const { userId } = useUserIdContext();
+  const { userId } = useUserContext();
   const { sendMessage } = useChatMessage(projectId);
   const [message, setMessage] = useState("");
 
@@ -31,18 +34,29 @@ export default function Chat({ projectId, onClose }: ChatProps) {
     }
   };
 
+  const handleBackToProjects = () => {
+    router.push("/");
+  };
+
   return (
     <div className="absolute left-6 top-6 bottom-6 z-30 w-96">
       <div className="h-full bg-white rounded-lg shadow-lg border border-gray-200 flex flex-col">
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Project Chat</h2>
+          <Button
+            variant="outline"
+            className="justify-start"
+            onClick={handleBackToProjects}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Projects
+          </Button>
           {onClose && (
             <Button
               variant="ghost"
               size="icon"
               onClick={onClose}
-              aria-label="Close chat"
-              title="Close chat"
+              aria-label="Close sidebar"
+              title="Close sidebar"
             >
               <PanelLeftClose className="h-4 w-4" />
             </Button>

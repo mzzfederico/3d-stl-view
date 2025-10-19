@@ -16,7 +16,12 @@ const appRouter = t.router({
       projectId: z.string(),
     })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     create: publicProcedure.input(z.object({
-      projectName: z.string(),
+      title: z.string(),
+    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    updateTitle: publicProcedure.input(z.object({
+      projectId: z.string(),
+      title: z.string(),
+      userId: z.string().optional(),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     uploadSTL: publicProcedure.input(z.object({
       projectId: z.string(),

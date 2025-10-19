@@ -4,9 +4,9 @@ A collaborative 3D model viewer where users can view STL files, leave chat messa
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15 with TypeScript, shadcn/ui, React Three Fiber
+- **Frontend**: Next.js 15 with TypeScript, shadcn/ui, React Three Fiber, Lucide React icons
 - **Backend**: NestJS v11 with tRPC
-- **Database**: MongoDB (project documents with STL files, chat logs, annotations, camera positions)
+- **Database**: MongoDB (project documents with STL files, chat logs, annotations, camera positions, user profiles)
 - **API Layer**: tRPC for type-safe communication
 - **Real-time**: Socket.IO for WebSocket subscriptions
 - **Validation**: Zod
@@ -94,22 +94,26 @@ pnpm run lint            # ESLint
 - **Real-time**: Socket.IO WebSocket gateway for subscriptions
 - **Entry Point**: `backend/src/main.ts` - Server runs on port 3001
 
-### MongoDB Document Schema
+### MongoDB Document Schemas
+
+#### Project Schema
 
 Each project is stored as a document with:
 ```typescript
 {
   projectId: string;
-  projectName: string;
+  title: string;
   stlFile?: string;  // Binary STL file data
   chatLog: Array<{
     userId: string;
+    userName?: string;  // Populated from User collection
     message: string;
     timestamp: Date;
   }>;
   annotations: Array<{
     text: string;
     userId: string;
+    userName?: string;  // Populated from User collection
     vertex: { x: number; y: number; z: number };
     timestamp: Date;
   }>;
@@ -127,7 +131,48 @@ Each project is stored as a document with:
 }
 ```
 
+#### User Schema
+
+Each user is stored as a document with:
+```typescript
+{
+  userId: string;      // Unique identifier
+  name: string;        // Display name (custom or auto-generated)
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
 ## Features
+
+### User Identification System
+
+The application implements a persistent user identification system for collaborative features:
+
+**User ID Generation:**
+- Backend generates unique `userId` when client first connects via WebSocket
+- `userId` is stored in browser's localStorage for persistence across sessions
+- Automatic reconnection using existing `userId` on subsequent visits
+
+**User Name Management:**
+- Modal appears on first visit prompting for a display name
+- Users can enter custom name or skip to auto-generate a random name
+- Random names generated using `unique-names-generator` (e.g., "Brave Red Tiger")
+- User names stored in MongoDB and associated with `userId`
+- Names displayed in chat messages and annotations instead of raw user IDs
+
+**Event Filtering:**
+- Backend tracks which user triggered each update (chat, camera, transformations)
+- WebSocket broadcasts filtered to exclude the triggering user
+- Prevents users from receiving duplicate updates for their own actions
+- Improves UX by avoiding unnecessary re-renders and flashing
+
+**Implementation:**
+- `UserGateway`: WebSocket gateway for user identification and name registration
+- `UserContext`: React context providing `userId` and `userName` globally
+- `UserNameModal`: Dialog component for name input with auto-generation option
+- `UserService`: MongoDB operations for creating/updating user profiles
+- Stored in localStorage: `3d-model-viewer-user-id` and `3d-model-viewer-user-name`
 
 ### 3D Model Transformation
 
@@ -226,27 +271,30 @@ User Action (chat/annotation/camera/STL)
 
 - `user.create` - Create user from name, returns userId
 - `projects.list` - Get all projects
-- `projects.get` - Get single project by ID
+- `projects.get` - Get single project by ID (includes populated userNames)
 - `projects.create` - Create new project
-- `projects.uploadSTL` - Upload STL file to project
-- `projects.addChatMessage` - Add message to chat log
-- `projects.addAnnotation` - Add annotation to 3D model
-- `projects.updateCamera` - Update camera position/rotation
-- `projects.updateModelTransform` - Update model origin, scale, and rotation
+- `projects.uploadSTL` - Upload STL file to project (includes userId)
+- `projects.addChatMessage` - Add message to chat log (includes userId)
+- `projects.addAnnotation` - Add annotation to 3D model (includes userId)
+- `projects.updateCamera` - Update camera position/rotation (includes userId)
+- `projects.updateModelTransform` - Update model origin, scale, and rotation (includes userId)
 
 ### WebSocket Events
 
 - **Client → Server**:
-  - `subscribeToProject` - Join a project room
+  - `subscribeToProject` - Join a project room (includes userId for filtering)
   - `unsubscribeFromProject` - Leave a project room
+  - `setUserName` - Register or update user's display name
 
 - **Server → Client**:
-  - `projectUpdate` - Broadcast when project data changes
+  - `userId` - Server assigns userId to client on connection
+  - `projectUpdate` - Broadcast when project data changes (filtered by userId)
     ```typescript
     {
       projectId: string;
       type: 'chat' | 'annotation' | 'camera' | 'stl' | 'modelTransform';
       timestamp: Date;
+      userId?: string;  // User who triggered the update (for filtering)
     }
     ```
 
@@ -258,8 +306,11 @@ User Action (chat/annotation/camera/STL)
 │   ├── src/
 │   │   ├── controllers/      # HTTP controllers
 │   │   ├── gateways/         # WebSocket gateways
-│   │   │   └── project.gateway.ts
+│   │   │   ├── project.gateway.ts
+│   │   │   └── user.gateway.ts
 │   │   ├── schemas/          # MongoDB schemas
+│   │   │   ├── project.schema.ts
+│   │   │   └── user.schema.ts
 │   │   ├── services/         # Business logic
 │   │   │   ├── events.service.ts
 │   │   │   ├── project.service.ts
@@ -275,6 +326,8 @@ User Action (chat/annotation/camera/STL)
 │   │   ├── project/[id]/
 │   │   │   ├── components/
 │   │   │   │   ├── Chat.tsx
+│   │   │   │   ├── ChatToggleButton.tsx
+│   │   │   │   ├── Commands.tsx
 │   │   │   │   ├── ModelTransformController.tsx
 │   │   │   │   ├── STLDropzone.tsx
 │   │   │   │   ├── STLModel.tsx
@@ -288,8 +341,13 @@ User Action (chat/annotation/camera/STL)
 │   │   │   │   └── useMouseNearbyVertices.ts
 │   │   │   └── page.tsx
 │   │   └── projects/
+│   ├── components/
+│   │   ├── ui/                      # shadcn/ui components
+│   │   └── UserNameModal.tsx
 │   ├── lib/
+│   │   ├── constants.ts             # Shared constants (Socket URL, storage keys)
 │   │   ├── context/
+│   │   │   ├── UserIdContext.tsx    # User identification context
 │   │   │   └── useModes.tsx         # Mode context (Transform/Note)
 │   │   ├── hooks/
 │   │   │   ├── useProjectData.ts

@@ -97,7 +97,7 @@ Each project is stored as a document with:
 - `annotations`: Array of `{ text: string, userId: string, vertex: { x: number, y: number, z: number }, timestamp: Date }`
 - `camera`: Object with `{ position: { x, y, z }, rotation: { x, y, z } }`
 - `projectId`: Unique identifier
-- `projectName`: Display name
+- `title`: Display name
 - `createdAt`, `updatedAt`: Timestamps
 
 ### Data Flow

@@ -4,19 +4,16 @@ import { useProjectData } from "@/lib/hooks/useProjectData";
 import { Project } from "@backend/schemas/project.schema";
 import { Grid, OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useCameraUpdate } from "../hooks/useCameraUpdate";
 import STLDropzone from "./STLDropzone";
 import STLModel from "./STLModel";
 import { vec3, euler } from "@/lib/three-utils";
 
-interface ThreeSceneProps {
-  projectId: Project["id"];
-}
-
-export default function ThreeScene({ projectId }: ThreeSceneProps) {
+export default function ThreeScene() {
   const router = useRouter();
+  const { id: projectId } = useParams<{ id: string }>();
 
   useEffect(() => {
     if (!projectId) router.push("/not-found");

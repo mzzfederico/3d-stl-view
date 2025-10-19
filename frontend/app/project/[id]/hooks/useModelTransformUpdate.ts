@@ -1,6 +1,6 @@
 import { useRef, useCallback } from "react";
 import { trpc } from "@/lib/trpc/client";
-import { useUserIdContext } from "@/lib/context/UserIdContext";
+import { useUserContext } from "@/lib/context/UserContext";
 import { Project } from "@backend/schemas/project.schema";
 
 interface Vector3 {
@@ -16,8 +16,9 @@ interface ModelTransformUpdate {
 }
 
 export function useModelTransformUpdate(projectId: string) {
-  const { userId } = useUserIdContext();
+  const { userId } = useUserContext();
   const utils = trpc.useUtils();
+
   const updateModelTransformMutation =
     trpc.projects.updateModelTransform.useMutation({
       onMutate: async (newTransform) => {
@@ -47,33 +48,21 @@ export function useModelTransformUpdate(projectId: string) {
           utils.projects.get.setData({ projectId }, context.previousProject);
         }
       },
-      onSettled: () => {
-        utils.projects.get.invalidate({ projectId });
-      },
     });
 
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const latestTransformRef = useRef<ModelTransformUpdate | null>(null);
 
   const updateModelTransform = useCallback(
     (origin?: Vector3, scale?: Vector3, rotation?: Vector3) => {
       latestTransformRef.current = { origin, scale, rotation };
 
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        if (latestTransformRef.current) {
-          updateModelTransformMutation.mutate({
-            projectId,
-            origin: latestTransformRef.current.origin,
-            scale: latestTransformRef.current.scale,
-            rotation: latestTransformRef.current.rotation,
-            userId: userId || undefined,
-          });
-        }
-      }, 500);
+      updateModelTransformMutation.mutate({
+        projectId,
+        origin: latestTransformRef.current.origin,
+        scale: latestTransformRef.current.scale,
+        rotation: latestTransformRef.current.rotation,
+        userId: userId || undefined,
+      });
     },
     [projectId, userId, updateModelTransformMutation],
   );

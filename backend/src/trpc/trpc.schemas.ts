@@ -11,7 +11,13 @@ export const getProjectSchema = z.object({
 });
 
 export const createProjectSchema = z.object({
-  projectName: z.string(),
+  title: z.string(),
+});
+
+export const updateProjectTitleSchema = z.object({
+  projectId: z.string(),
+  title: z.string(),
+  userId: z.string().optional(),
 });
 
 export const uploadSTLSchema = z.object({

@@ -1,7 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { uniqueNamesGenerator, adjectives, colors, animals } from "unique-names-generator";
+import { useCallback, useState } from "react";
+import {
+  uniqueNamesGenerator,
+  adjectives,
+  colors,
+  animals,
+} from "unique-names-generator";
 import {
   Dialog,
   DialogContent,
@@ -12,14 +17,27 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { BaseModalProps } from "@/lib/types/modal";
+import { match } from "ts-pattern";
+import { useUserContext } from "@/lib/context/UserContext";
 
-interface UserNameModalProps {
-  open: boolean;
+export type UserNameModalMode = "create" | "edit";
+
+export interface UserNameModalProps extends BaseModalProps {
+  mode: UserNameModalMode;
   onSubmit: (name: string) => void;
+  canDismiss: boolean;
 }
 
-export default function UserNameModal({ open, onSubmit }: UserNameModalProps) {
-  const [name, setName] = useState("");
+export default function UserNameModal({
+  open,
+  setOpen,
+  mode,
+  onSubmit,
+  canDismiss,
+}: UserNameModalProps) {
+  const user = useUserContext();
+  const [name, setName] = useState(user.userName ?? "");
 
   const generateRandomName = () => {
     return uniqueNamesGenerator({
@@ -29,24 +47,60 @@ export default function UserNameModal({ open, onSubmit }: UserNameModalProps) {
     });
   };
 
-  const handleSubmit = () => {
+  const closeModal = useCallback(() => {
+    if (canDismiss) {
+      setOpen(false);
+    }
+  }, [canDismiss, setOpen]);
+
+  const handleSubmit = useCallback(() => {
     const finalName = name.trim() || generateRandomName();
     onSubmit(finalName);
-  };
+    setName("");
+    setOpen(false);
+  }, [name, onSubmit, setOpen]);
 
-  const handleSkip = () => {
+  const handleSkip = useCallback(() => {
     const randomName = generateRandomName();
     onSubmit(randomName);
-  };
+    setName("");
+    setOpen(false);
+  }, [onSubmit, setOpen]);
+
+  const dialogHeader = match(mode)
+    .with("create", () => ({
+      title: "Welcome",
+      description: "Please enter your name to get started, or skip.",
+    }))
+    .with("edit", () => ({
+      title: "Edit Name",
+      description: "Update your display name.",
+    }))
+    .exhaustive();
+
+  const actionButton = match(mode)
+    .with("create", () => (
+      <Button variant="outline" onClick={handleSkip}>
+        Skip (Random Name)
+      </Button>
+    ))
+    .with("edit", () => (
+      <Button variant="outline" onClick={() => setOpen(false)}>
+        Cancel
+      </Button>
+    ))
+    .exhaustive();
 
   return (
-    <Dialog open={open}>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent
+        className="sm:max-w-[425px]"
+        onEscapeKeyDown={(e) => !canDismiss && e.preventDefault()}
+        onPointerDownOutside={(e) => !canDismiss && e.preventDefault()}
+      >
         <DialogHeader>
-          <DialogTitle>Welcome to 3D Model Viewer</DialogTitle>
-          <DialogDescription>
-            Please enter your name to get started. You can skip and we'll generate a random name for you.
-          </DialogDescription>
+          <DialogTitle>{dialogHeader.title}</DialogTitle>
+          <DialogDescription>{dialogHeader.description}</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <Input
@@ -61,9 +115,7 @@ export default function UserNameModal({ open, onSubmit }: UserNameModalProps) {
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={handleSkip}>
-            Skip (Random Name)
-          </Button>
+          {actionButton}
           <Button onClick={handleSubmit}>
             {name.trim() ? "Continue" : "Generate Name"}
           </Button>
