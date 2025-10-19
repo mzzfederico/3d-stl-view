@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { Vector3 } from "three";
 import { useThree } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
-import * as THREE from "three";
+import { Group } from "three";
 
 interface AnnotationMarkerProps {
   position: Vector3;
@@ -19,7 +19,7 @@ export function AnnotationMarker({
   onClick,
   isOpen,
 }: AnnotationMarkerProps) {
-  const groupRef = useRef<THREE.Group>(null);
+  const groupRef = useRef<Group>(null);
   const { camera, size } = useThree();
   const [isHovered, setIsHovered] = useState(false);
 
@@ -69,7 +69,9 @@ export function AnnotationMarker({
             userSelect: "none",
           }}
         >
-          <span style={{ color: "white", fontWeight: "bold", fontSize: "14px" }}>
+          <span
+            style={{ color: "white", fontWeight: "bold", fontSize: "14px" }}
+          >
             i
           </span>
         </div>

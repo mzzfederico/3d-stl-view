@@ -67,7 +67,7 @@ export function AnnotationPopupOverlay({
       onMouseEnter={(e) => e.stopPropagation()}
       onMouseLeave={(e) => e.stopPropagation()}
     >
-      <div className="bg-white border border-gray-300 rounded-lg shadow-lg p-3 w-[250px]">
+      <div className="bg-white border border-gray-300 rounded-lg shadow-lg p-3 w-[250px] z-50">
         {/* Header with user name and close button */}
         <div className="flex items-center justify-between mb-2">
           <div className="text-xs text-gray-500 font-medium">{userName}</div>
@@ -95,7 +95,11 @@ export function AnnotationPopupOverlay({
               <Button size="sm" variant="outline" onClick={handleCancel}>
                 Cancel
               </Button>
-              <Button size="sm" onClick={handleSave} disabled={!editText.trim()}>
+              <Button
+                size="sm"
+                onClick={handleSave}
+                disabled={!editText.trim()}
+              >
                 Save
               </Button>
             </div>

@@ -12,7 +12,12 @@ import { useUserContext } from "@/lib/context/UserContext";
 import STLDropzone from "./STLDropzone";
 import STLModel from "./STLModel";
 import { CameraController } from "./CameraController";
-import { AnnotationPopupOverlay, AnnotationCreatorOverlay, HoveredAnnotation, CreatingAnnotation } from "./annotations";
+import {
+  AnnotationPopupOverlay,
+  AnnotationCreatorOverlay,
+  HoveredAnnotation,
+  CreatingAnnotation,
+} from "./annotations";
 import { vec3, euler } from "@/lib/three-utils";
 
 export default function ThreeScene() {
@@ -45,7 +50,7 @@ export default function ThreeScene() {
     <div className="absolute inset-0 bg-gray-900">
       <STLDropzone projectId={projectId} hasSTL={!!project.stlFile} />
 
-      <Canvas className="w-full h-full">
+      <Canvas className="w-full h-full z-0">
         <CameraController />
 
         {/* Lighting */}

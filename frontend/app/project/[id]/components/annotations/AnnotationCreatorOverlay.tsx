@@ -37,7 +37,7 @@ export function AnnotationCreatorOverlay({
         top: screenY - 10,
       }}
     >
-      <div className="bg-white border border-blue-400 rounded-lg shadow-lg p-3 w-[250px]">
+      <div className="bg-white border border-blue-400 rounded-lg shadow-lg p-3 w-[250px] z-50">
         {/* Header */}
         <div className="flex items-center justify-between mb-2">
           <div className="text-sm font-medium text-gray-700">
