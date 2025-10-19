@@ -31,6 +31,7 @@ export default function STLModel({
   const nearestVertex = useMouseNearbyVertices({
     vertices,
     mesh: meshRef.current,
+    enabled: currentMode === MODES.Note,
   });
 
   if (!geometry) {

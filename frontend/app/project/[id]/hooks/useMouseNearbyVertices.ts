@@ -5,20 +5,28 @@ import { Vector2, Vector3, Raycaster, Camera, Mesh } from "three";
 interface UseMouseNearbyVerticesOptions {
   vertices: Vector3[];
   mesh: Mesh | null;
+  enabled?: boolean;
 }
 
 export function useMouseNearbyVertices({
   vertices,
   mesh,
+  enabled = true,
 }: UseMouseNearbyVerticesOptions) {
   const { camera, gl } = useThree();
   const canvas = gl.domElement;
 
   const [nearestVertex, setNearestVertex] = useState<Vector3 | null>(null);
   const raycasterRef = useRef(new Raycaster());
+  const lastMousePosRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     if (!mesh || vertices.length === 0 || !canvas) {
+      setNearestVertex(null);
+      return;
+    }
+
+    if (!enabled) {
       setNearestVertex(null);
       return;
     }
@@ -50,6 +58,9 @@ export function useMouseNearbyVertices({
     };
 
     const handleMouseMove = (event: MouseEvent) => {
+      // Store last mouse position
+      lastMousePosRef.current = { x: event.clientX, y: event.clientY };
+
       // Get canvas bounding rectangle
       const rect = canvas.getBoundingClientRect();
 
@@ -81,10 +92,24 @@ export function useMouseNearbyVertices({
 
     canvas.addEventListener("mousemove", handleMouseMove);
 
+    // When enabled becomes true (switching to Note mode), use last mouse position
+    // or center of canvas to trigger immediate calculation
+    requestAnimationFrame(() => {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = lastMousePosRef.current?.x ?? rect.left + rect.width / 2;
+      const clientY = lastMousePosRef.current?.y ?? rect.top + rect.height / 2;
+
+      const syntheticEvent = new MouseEvent("mousemove", {
+        clientX,
+        clientY,
+      });
+      handleMouseMove(syntheticEvent);
+    });
+
     return () => {
       canvas.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [vertices, mesh, camera, canvas]);
+  }, [vertices, mesh, camera, canvas, enabled]);
 
   return nearestVertex;
 }
