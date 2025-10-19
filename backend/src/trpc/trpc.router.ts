@@ -47,7 +47,7 @@ export class ProjectsRouter {
 
   @Mutation({ input: uploadSTLSchema })
   async uploadSTL(@Input() input: z.infer<typeof uploadSTLSchema>) {
-    return this.projectService.uploadSTL(input.projectId, input.stlFile);
+    return this.projectService.uploadSTL(input.projectId, input.stlFile, input.userId);
   }
 
   @Mutation({ input: addChatMessageSchema })
@@ -75,6 +75,7 @@ export class ProjectsRouter {
       input.projectId,
       input.position,
       input.rotation,
+      input.userId,
     );
   }
 
@@ -87,6 +88,7 @@ export class ProjectsRouter {
       input.origin,
       input.scale,
       input.rotation,
+      input.userId,
     );
   }
 }

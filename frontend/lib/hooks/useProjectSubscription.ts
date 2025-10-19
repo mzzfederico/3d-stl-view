@@ -3,8 +3,10 @@
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { trpc } from "../trpc/client";
+import { SOCKET_URL } from "../constants";
 
 interface ProjectSubscriptionOptions {
+  userId?: string | null;
   onCameraUpdate?: () => void;
 }
 
@@ -16,16 +18,16 @@ export function useProjectSubscription(
 
   useEffect(() => {
     // Connect to WebSocket server
-    const socket = io(
-      process.env.NEXT_PUBLIC_WS_URL || "http://localhost:3001",
-      {
-        transports: ["websocket", "polling"],
-      },
-    );
+    const socket = io(SOCKET_URL, {
+      transports: ["websocket", "polling"],
+    });
 
     socket.on("connect", () => {
       console.log("WebSocket connected:", socket.id);
-      socket.emit("subscribeToProject", projectId);
+      socket.emit("subscribeToProject", {
+        projectId,
+        userId: options?.userId || undefined
+      });
     });
 
     socket.on(
@@ -55,5 +57,5 @@ export function useProjectSubscription(
       socket.emit("unsubscribeFromProject", projectId);
       socket.disconnect();
     };
-  }, [projectId, utils, options]);
+  }, [projectId, utils, options?.userId]);
 }

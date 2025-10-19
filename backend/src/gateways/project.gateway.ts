@@ -25,11 +25,24 @@ export class ProjectGateway
   constructor(private readonly eventsService: EventsService) {}
 
   afterInit() {
-    Logger.log('WebSocket Gateway initialized');
+    Logger.log('Project Gateway initialized');
 
-    this.eventsService.on('projectUpdate', (event: ProjectUpdateEvent) => {
-      Logger.log(`Project ${event.projectId} updated`);
-      this.server.to(`project:${event.projectId}`).emit('projectUpdate', event);
+    this.eventsService.on('projectUpdate', async (event: ProjectUpdateEvent) => {
+      Logger.log(`Project ${event.projectId} updated by user ${event.userId}`);
+
+      if (event.userId) {
+        // Broadcast to all clients in the project room except the user who triggered it
+        const sockets = await this.server.in(`project:${event.projectId}`).fetchSockets();
+        sockets.forEach(socket => {
+          // Only emit if this socket doesn't belong to the user who triggered the event
+          if (socket.data.userId !== event.userId) {
+            socket.emit('projectUpdate', event);
+          }
+        });
+      } else {
+        // If no userId, broadcast to everyone (backward compatibility)
+        this.server.to(`project:${event.projectId}`).emit('projectUpdate', event);
+      }
     });
   }
 
@@ -42,9 +55,16 @@ export class ProjectGateway
   }
 
   @SubscribeMessage('subscribeToProject')
-  handleSubscribeToProject(client: Socket, projectId: string) {
+  handleSubscribeToProject(client: Socket, payload: { projectId: string; userId?: string }) {
+    const { projectId, userId } = payload;
+
+    // Store userId in socket data if provided
+    if (userId) {
+      client.data.userId = userId;
+    }
+
     client.join(`project:${projectId}`);
-    Logger.log(`Client ${client.id} subscribed to project ${projectId}`);
+    Logger.log(`Client ${client.id} (userId: ${client.data.userId}) subscribed to project ${projectId}`);
     return { success: true };
   }
 

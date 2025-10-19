@@ -1,5 +1,6 @@
 import { useRef, useCallback } from "react";
 import { trpc } from "@/lib/trpc/client";
+import { useUserIdContext } from "@/lib/context/UserIdContext";
 import { Project } from "@backend/schemas/project.schema";
 
 interface Vector3 {
@@ -15,6 +16,7 @@ interface ModelTransformUpdate {
 }
 
 export function useModelTransformUpdate(projectId: string) {
+  const { userId } = useUserIdContext();
   const utils = trpc.useUtils();
   const updateModelTransformMutation =
     trpc.projects.updateModelTransform.useMutation({
@@ -68,11 +70,12 @@ export function useModelTransformUpdate(projectId: string) {
             origin: latestTransformRef.current.origin,
             scale: latestTransformRef.current.scale,
             rotation: latestTransformRef.current.rotation,
+            userId: userId || undefined,
           });
         }
       }, 500);
     },
-    [projectId, updateModelTransformMutation],
+    [projectId, userId, updateModelTransformMutation],
   );
 
   return { updateModelTransform };

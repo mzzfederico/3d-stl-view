@@ -5,6 +5,7 @@ export interface ProjectUpdateEvent {
   projectId: string;
   type: 'chat' | 'annotation' | 'camera' | 'stl' | 'modelTransform';
   timestamp: Date;
+  userId?: string; // User who triggered the update
 }
 
 @Injectable()

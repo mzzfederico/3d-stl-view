@@ -1,5 +1,6 @@
 import { useRef, useCallback } from "react";
 import { trpc } from "@/lib/trpc/client";
+import { useUserIdContext } from "@/lib/context/UserIdContext";
 import { Project } from "@backend/schemas/project.schema";
 
 interface CameraPosition {
@@ -8,6 +9,7 @@ interface CameraPosition {
 }
 
 export function useCameraUpdate(projectId: string) {
+  const { userId } = useUserIdContext();
   const utils = trpc.useUtils();
   const updateCameraMutation = trpc.projects.updateCamera.useMutation({
     onMutate: async (newCamera) => {
@@ -58,11 +60,12 @@ export function useCameraUpdate(projectId: string) {
             projectId,
             position: latestCameraRef.current.position,
             rotation: latestCameraRef.current.rotation,
+            userId: userId || undefined,
           });
         }
       }, 500);
     },
-    [projectId, updateCameraMutation],
+    [projectId, userId, updateCameraMutation],
   );
 
   return { updateCamera };

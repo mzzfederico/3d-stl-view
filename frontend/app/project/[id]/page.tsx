@@ -1,6 +1,7 @@
 "use client";
 
 import { ModeProvider } from "@/lib/context/useModes";
+import { useUserIdContext } from "@/lib/context/UserIdContext";
 import { useProjectSubscription } from "@/lib/hooks/useProjectSubscription";
 import { useParams } from "next/navigation";
 import { Suspense } from "react";
@@ -10,9 +11,10 @@ import ThreeScene from "./components/ThreeScene";
 
 export default function ProjectPage() {
   const { id } = useParams<{ id: string }>();
+  const { userId } = useUserIdContext();
 
   // Subscribe to real-time project updates
-  useProjectSubscription(id);
+  useProjectSubscription(id, { userId });
 
   return (
     <ModeProvider>

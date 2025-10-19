@@ -4,6 +4,7 @@ import { TrpcModule } from './trpc/trpc.module';
 import { User, UserSchema } from './schemas/user.schema';
 import { Project, ProjectSchema } from './schemas/project.schema';
 import { ProjectGateway } from './gateways/project.gateway';
+import { UserGateway } from './gateways/user.gateway';
 
 @Module({
   imports: [
@@ -18,6 +19,6 @@ import { ProjectGateway } from './gateways/project.gateway';
     TrpcModule,
   ],
   controllers: [],
-  providers: [ProjectGateway],
+  providers: [ProjectGateway, UserGateway],
 })
 export class AppModule {}

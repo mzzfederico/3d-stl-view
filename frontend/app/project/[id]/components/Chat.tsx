@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useChatMessage } from "../hooks/useChatMessage";
 import { useProjectData } from "@/lib/hooks/useProjectData";
+import { useUserIdContext } from "@/lib/context/UserIdContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Project } from "@backend/schemas/project.schema";
@@ -11,12 +12,13 @@ interface ChatProps {
 
 export default function Chat({ projectId }: ChatProps) {
   const { project, query } = useProjectData(projectId);
+  const { userId } = useUserIdContext();
   const { sendMessage } = useChatMessage(projectId);
   const [message, setMessage] = useState("");
 
   const handleSend = () => {
-    if (message.trim() && projectId) {
-      sendMessage("temp-user-id", message);
+    if (message.trim() && projectId && userId) {
+      sendMessage(userId, message);
       setMessage("");
     }
   };
@@ -37,9 +39,9 @@ export default function Chat({ projectId }: ChatProps) {
         {project.chatLog.length === 0 && (
           <p className="text-sm text-gray-500">No messages yet...</p>
         )}
-        {project.chatLog.map(({ userId, timestamp, message }) => (
+        {project.chatLog.map(({ userId, userName, timestamp, message }) => (
           <div key={new Date(timestamp).getTime()} className="mb-2">
-            <p className="text-sm text-gray-500">{userId}</p>
+            <p className="text-sm text-gray-500">{userName || userId}</p>
             <p className="text-sm text-gray-700">{message}</p>
           </div>
         ))}

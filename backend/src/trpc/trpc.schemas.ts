@@ -17,6 +17,7 @@ export const createProjectSchema = z.object({
 export const uploadSTLSchema = z.object({
   projectId: z.string(),
   stlFile: z.string(), // Base64 encoded
+  userId: z.string().optional(),
 });
 
 export const addChatMessageSchema = z.object({
@@ -38,6 +39,7 @@ export const addAnnotationSchema = z.object({
 
 export const updateCameraSchema = z.object({
   projectId: z.string(),
+  userId: z.string().optional(),
   position: z.object({
     x: z.number(),
     y: z.number(),
@@ -52,6 +54,7 @@ export const updateCameraSchema = z.object({
 
 export const updateModelTransformSchema = z.object({
   projectId: z.string(),
+  userId: z.string().optional(),
   origin: z
     .object({
       x: z.number(),

@@ -21,6 +21,7 @@ const appRouter = t.router({
     uploadSTL: publicProcedure.input(z.object({
       projectId: z.string(),
       stlFile: z.string(), // Base64 encoded
+      userId: z.string().optional(),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     addChatMessage: publicProcedure.input(z.object({
       projectId: z.string(),
@@ -39,6 +40,7 @@ const appRouter = t.router({
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     updateCamera: publicProcedure.input(z.object({
       projectId: z.string(),
+      userId: z.string().optional(),
       position: z.object({
         x: z.number(),
         y: z.number(),
@@ -52,6 +54,7 @@ const appRouter = t.router({
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     updateModelTransform: publicProcedure.input(z.object({
       projectId: z.string(),
+      userId: z.string().optional(),
       origin: z
         .object({
           x: z.number(),
