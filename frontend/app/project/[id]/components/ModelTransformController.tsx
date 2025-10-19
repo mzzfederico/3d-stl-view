@@ -4,7 +4,7 @@ import { useRef, useEffect } from "react";
 import { Mesh, Euler, Vector3, Matrix4, Quaternion } from "three";
 import { PivotControls } from "@react-three/drei";
 import { useModelTransformUpdate } from "../hooks/useModelTransformUpdate";
-import { useMode, MODES } from "@/lib/context/useModes";
+import { useMode, ApplicationMode } from "@/lib/context/useModes";
 import { vec3, euler } from "@/lib/three-utils";
 
 interface ModelTransformControllerProps {
@@ -61,7 +61,7 @@ export default function ModelTransformController({
   }
 
   // Only enable controls in Transform mode
-  const isTransformMode = currentMode === MODES.Transform;
+  const isTransformMode = currentMode === ApplicationMode.Transform;
 
   return (
     <PivotControls

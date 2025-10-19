@@ -5,13 +5,14 @@ import { Plus } from "lucide-react";
 import { useModal, ModalId } from "@/lib/context/ModalContext";
 
 export function CreateProjectDialog() {
-  const { openModal } = useModal();
+  const { openModal, closeModal } = useModal();
 
   const handleOpenCreateModal = () => {
     openModal(ModalId.CreateProject, {
       onSuccess: (projectId) => {
         // Navigation is handled in the modal component
         console.log("Project created:", projectId);
+        closeModal();
       },
     });
   };

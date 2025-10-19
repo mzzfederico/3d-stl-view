@@ -4,10 +4,15 @@ import { useMouseNearbyVertices } from "../hooks/useMouseNearbyVertices";
 import useGeometryVertex from "../hooks/useGeometryVertex";
 import useConvertBinaryIntoGeometry from "../hooks/useConvertBinaryIntoGeometry";
 import ModelTransformController from "./ModelTransformController";
-import { useMode, MODES } from "@/lib/context/useModes";
+import { useMode, ApplicationMode } from "@/lib/context/useModes";
 
 import { VertexIndicator } from "./VertexIndicator";
-import { AnnotationScene, AnnotationSceneRef, HoveredAnnotation, CreatingAnnotation } from "./annotations";
+import {
+  AnnotationScene,
+  AnnotationSceneRef,
+  HoveredAnnotation,
+  CreatingAnnotation,
+} from "./annotations";
 
 interface Annotation {
   text: string;
@@ -27,7 +32,10 @@ interface STLModelProps {
   };
   annotations?: Annotation[];
   currentUserId: string;
-  addAnnotation: (text: string, vertex: { x: number; y: number; z: number }) => void;
+  addAnnotation: (
+    text: string,
+    vertex: { x: number; y: number; z: number },
+  ) => void;
   editAnnotation: (annotationId: string, newText: string) => void;
   deleteAnnotation: (annotationId: string) => void;
   loadUserName: (userId: string) => Promise<string>;
@@ -59,7 +67,7 @@ export default function STLModel({
   const nearestVertex = useMouseNearbyVertices({
     vertices,
     mesh: meshRef.current,
-    enabled: currentMode === MODES.Note,
+    enabled: currentMode === ApplicationMode.Note,
   });
 
   const handleVertexClick = () => {

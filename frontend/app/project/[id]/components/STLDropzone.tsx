@@ -5,6 +5,7 @@ import { useDropzone } from "react-dropzone";
 import { Project } from "@backend/schemas/project.schema";
 import { trpc } from "@/lib/trpc/client";
 import { match } from "ts-pattern";
+import { vec3 } from "@/lib/three-utils";
 
 interface STLDropzoneProps {
   projectId: Project["id"];
@@ -14,6 +15,7 @@ interface STLDropzoneProps {
 export default function STLDropzone({ projectId, hasSTL }: STLDropzoneProps) {
   const utils = trpc.useUtils();
   const uploadSTLMutation = trpc.projects.uploadSTL.useMutation();
+  const updateTransform = trpc.projects.updateModelTransform.useMutation();
   const [isDraggingFile, setIsDraggingFile] = useState(false);
 
   const onDrop = useCallback(
@@ -35,6 +37,13 @@ export default function STLDropzone({ projectId, hasSTL }: STLDropzoneProps) {
             await uploadSTLMutation.mutateAsync({
               projectId,
               stlFile: base64,
+            });
+
+            await updateTransform.mutateAsync({
+              projectId,
+              origin: vec3({ x: 0, y: 0, z: 0 }),
+              scale: vec3({ x: 1, y: 1, z: 1 }),
+              rotation: vec3({ x: 0, y: 0, z: 0 }),
             });
 
             await utils.projects.get.invalidate({ projectId });

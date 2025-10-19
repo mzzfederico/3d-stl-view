@@ -4,6 +4,10 @@ import { useState } from "react";
 import { AnnotationMarker } from "./AnnotationMarker";
 import { vec3 } from "@/lib/three-utils";
 import { useAnnotationContext } from "./AnnotationContext";
+import {
+  ApplicationMode as ApplicationMode,
+  useMode,
+} from "@/lib/context/useModes";
 
 interface Annotation {
   text: string;
@@ -19,6 +23,7 @@ interface AnnotationsProps {
 }
 
 export function Annotations({ annotations }: AnnotationsProps) {
+  const mode = useMode();
   const [openId, setOpenId] = useState<string | null>(null);
   const { onHoverChange } = useAnnotationContext();
 
@@ -35,6 +40,8 @@ export function Annotations({ annotations }: AnnotationsProps) {
       onHoverChange({ annotationId, annotation, screenX, screenY });
     }
   };
+
+  if (mode.currentMode !== ApplicationMode.Note) return null;
 
   return (
     <>

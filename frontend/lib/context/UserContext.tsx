@@ -17,22 +17,24 @@ import {
 import { useUserSocket } from "../hooks/useUserSocket";
 
 interface UserContextState {
-  userId?: string;
+  userId: string;
   userName?: string;
   updateName: (name: string) => void;
 }
 
 export const UserContext = createContext<UserContextState>({
+  userId: "",
   updateName: () => {},
 });
 
 export const UserIdProvider = ({
   children,
 }: PropsWithChildren): JSX.Element => {
-  const [userId, setUserId] = useState<string | undefined>(() => {
+  const [userId, setUserId] = useState<string>(() => {
     if (typeof window !== "undefined") {
-      return window?.localStorage?.getItem(USER_ID_STORAGE_KEY) ?? undefined;
+      return window?.localStorage?.getItem(USER_ID_STORAGE_KEY) ?? "";
     }
+    return "";
   });
 
   const [userName, setUserName] = useState<string | undefined>(() => {

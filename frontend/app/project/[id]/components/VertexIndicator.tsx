@@ -1,6 +1,6 @@
 "use client";
 
-import { useMode, MODES } from "@/lib/context/useModes";
+import { useMode, ApplicationMode } from "@/lib/context/useModes";
 import { ThreeEvent } from "@react-three/fiber";
 
 interface VertexIndicatorProps {
@@ -11,7 +11,7 @@ interface VertexIndicatorProps {
 export function VertexIndicator({ vertex, onClick }: VertexIndicatorProps) {
   const { currentMode } = useMode();
 
-  if (!vertex || currentMode !== MODES.Note) {
+  if (!vertex || currentMode !== ApplicationMode.Note) {
     return null;
   }
 

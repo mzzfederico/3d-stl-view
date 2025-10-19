@@ -6,23 +6,23 @@ import {
   useState,
 } from "react";
 
-export const enum MODES {
+export const enum ApplicationMode {
   Transform,
   Note,
 }
 
 interface ModeContextState {
-  currentMode: MODES;
-  setMode: (mode: MODES) => void;
+  currentMode: ApplicationMode;
+  setMode: (mode: ApplicationMode) => void;
 }
 
 export const ModeContext = createContext<ModeContextState>({
-  currentMode: MODES.Transform,
+  currentMode: ApplicationMode.Transform,
   setMode: () => {},
 });
 
 export const ModeProvider = ({ children }: PropsWithChildren): JSX.Element => {
-  const [mode, setMode] = useState<MODES>(MODES.Transform);
+  const [mode, setMode] = useState<ApplicationMode>(ApplicationMode.Transform);
   return (
     <ModeContext.Provider value={{ setMode, currentMode: mode }}>
       {children}

@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { MODES, useMode } from "@/lib/context/useModes";
+import { ApplicationMode, useMode } from "@/lib/context/useModes";
 import { Move3d, StickyNote } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
 
 interface CommandButtonProps {
-  mode: MODES;
+  mode: ApplicationMode;
   icon: LucideIcon;
   label: string;
 }
@@ -35,8 +35,16 @@ export default function Commands() {
   return (
     <aside className="fixed right-6 top-6 z-40 bg-white rounded-lg shadow-lg border border-gray-200 p-2">
       <div className="flex flex-col gap-2">
-        <CommandButton mode={MODES.Transform} icon={Move3d} label="Transform" />
-        <CommandButton mode={MODES.Note} icon={StickyNote} label="Note" />
+        <CommandButton
+          mode={ApplicationMode.Transform}
+          icon={Move3d}
+          label="Transform"
+        />
+        <CommandButton
+          mode={ApplicationMode.Note}
+          icon={StickyNote}
+          label="Note"
+        />
       </div>
     </aside>
   );
