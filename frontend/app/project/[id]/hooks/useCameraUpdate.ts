@@ -13,8 +13,6 @@ export function useCameraUpdate(projectId: string) {
   const utils = trpc.useUtils();
   const updateCameraMutation = trpc.projects.updateCamera.useMutation({
     onMutate: async (newCamera) => {
-      await utils.projects.get.cancel({ projectId });
-
       const previousProject = utils.projects.get.getData({ projectId });
 
       utils.projects.get.setData({ projectId }, (old: Project) => {
@@ -34,9 +32,6 @@ export function useCameraUpdate(projectId: string) {
       if (context?.previousProject) {
         utils.projects.get.setData({ projectId }, context.previousProject);
       }
-    },
-    onSettled: () => {
-      utils.projects.get.invalidate({ projectId });
     },
   });
 

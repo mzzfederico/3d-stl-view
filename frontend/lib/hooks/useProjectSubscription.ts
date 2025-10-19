@@ -31,8 +31,16 @@ export function useProjectSubscription(
 
     socket.on(
       "projectUpdate",
-      (data: { projectId: string; type: string; timestamp: Date }) => {
-        utils.projects.get.invalidate({ projectId });
+      (data: { projectId: string; type: string; timestamp: Date; userId?: string }) => {
+        // Only invalidate if:
+        // 1. The update is from a different user, OR
+        // 2. The window is not focused (so we get updates when we come back)
+        const isFromSelf = data.userId === options?.userId;
+        const isWindowFocused = document.hasFocus();
+
+        if (!isFromSelf || !isWindowFocused) {
+          utils.projects.get.invalidate({ projectId });
+        }
       },
     );
 

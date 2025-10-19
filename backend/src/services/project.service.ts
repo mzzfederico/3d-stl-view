@@ -189,6 +189,100 @@ export class ProjectService {
     return { success: result.modifiedCount > 0 };
   }
 
+  async editAnnotation(
+    projectId: string,
+    annotationId: string,
+    text: string,
+    userId?: string,
+  ): Promise<{ success: boolean }> {
+    const project = await this.projectModel.findOne({ projectId }).exec();
+
+    if (!project) {
+      return { success: false };
+    }
+
+    // Find annotation by constructing the same ID format
+    const annotationIndex = project.annotations.findIndex((annotation) => {
+      const id = `${annotation.userId}-${annotation.timestamp.getTime()}`;
+      return id === annotationId;
+    });
+
+    if (annotationIndex === -1) {
+      return { success: false };
+    }
+
+    // Update the annotation text
+    const result = await this.projectModel
+      .updateOne(
+        { projectId },
+        {
+          $set: {
+            [`annotations.${annotationIndex}.text`]: text,
+          },
+        },
+      )
+      .exec();
+
+    if (result.modifiedCount > 0) {
+      this.eventsService.emitProjectUpdate({
+        projectId,
+        type: 'annotation',
+        timestamp: new Date(),
+        userId,
+      });
+    }
+
+    return { success: result.modifiedCount > 0 };
+  }
+
+  async deleteAnnotation(
+    projectId: string,
+    annotationId: string,
+    userId?: string,
+  ): Promise<{ success: boolean }> {
+    const project = await this.projectModel.findOne({ projectId }).exec();
+
+    if (!project) {
+      return { success: false };
+    }
+
+    // Find annotation by constructing the same ID format
+    const annotation = project.annotations.find((annotation) => {
+      const id = `${annotation.userId}-${annotation.timestamp.getTime()}`;
+      return id === annotationId;
+    });
+
+    if (!annotation) {
+      return { success: false };
+    }
+
+    // Remove the annotation
+    const result = await this.projectModel
+      .updateOne(
+        { projectId },
+        {
+          $pull: {
+            annotations: {
+              userId: annotation.userId,
+              timestamp: annotation.timestamp,
+            },
+          },
+        },
+      )
+      .exec();
+
+    if (result.modifiedCount > 0) {
+      this.eventsService.emitProjectUpdate({
+        projectId,
+        type: 'annotation',
+        timestamp: new Date(),
+        userId,
+      });
+    }
+
+    return { success: result.modifiedCount > 0 };
+  }
+
   async updateCamera(
     projectId: string,
     position: { x: number; y: number; z: number },

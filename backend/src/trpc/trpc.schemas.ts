@@ -43,6 +43,23 @@ export const addAnnotationSchema = z.object({
   }),
 });
 
+export const editAnnotationSchema = z.object({
+  projectId: z.string(),
+  annotationId: z.string(),
+  text: z.string(),
+  userId: z.string().optional(),
+});
+
+export const deleteAnnotationSchema = z.object({
+  projectId: z.string(),
+  annotationId: z.string(),
+  userId: z.string().optional(),
+});
+
+export const getUserSchema = z.object({
+  userId: z.string(),
+});
+
 export const updateCameraSchema = z.object({
   projectId: z.string(),
   userId: z.string().optional(),

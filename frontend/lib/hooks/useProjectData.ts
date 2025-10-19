@@ -7,8 +7,10 @@ export function useProjectData(projectId: string) {
       projectId,
     },
     {
-      refetchOnWindowFocus: true,
-      refetchIntervalInBackground: true,
+      refetchOnWindowFocus: false, // Rely on WebSocket updates instead
+      refetchOnMount: false, // Don't refetch on component mount
+      refetchIntervalInBackground: false,
+      staleTime: Infinity, // Data never goes stale - we update via WebSocket
     },
   );
 

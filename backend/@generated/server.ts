@@ -8,7 +8,10 @@ const appRouter = t.router({
   user: t.router({
     create: publicProcedure.input(z.object({
       name: z.string(),
-    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    get: publicProcedure.input(z.object({
+      userId: z.string(),
+    })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   }),
   projects: t.router({
     list: publicProcedure.query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
@@ -42,6 +45,17 @@ const appRouter = t.router({
         y: z.number(),
         z: z.number(),
       }),
+    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    editAnnotation: publicProcedure.input(z.object({
+      projectId: z.string(),
+      annotationId: z.string(),
+      text: z.string(),
+      userId: z.string().optional(),
+    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    deleteAnnotation: publicProcedure.input(z.object({
+      projectId: z.string(),
+      annotationId: z.string(),
+      userId: z.string().optional(),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     updateCamera: publicProcedure.input(z.object({
       projectId: z.string(),

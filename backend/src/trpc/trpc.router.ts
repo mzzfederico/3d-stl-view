@@ -2,12 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { Router, Query, Mutation, Input } from 'nestjs-trpc';
 import {
   createUserSchema,
+  getUserSchema,
   getProjectSchema,
   createProjectSchema,
   updateProjectTitleSchema,
   uploadSTLSchema,
   addChatMessageSchema,
   addAnnotationSchema,
+  editAnnotationSchema,
+  deleteAnnotationSchema,
   updateCameraSchema,
   updateModelTransformSchema,
 } from './trpc.schemas';
@@ -23,6 +26,11 @@ export class UserRouter {
   @Mutation({ input: createUserSchema })
   async create(@Input() input: z.infer<typeof createUserSchema>) {
     return this.userService.createUser(input.name);
+  }
+
+  @Query({ input: getUserSchema })
+  async get(@Input() input: z.infer<typeof getUserSchema>) {
+    return this.userService.getUserById(input.userId);
   }
 }
 
@@ -80,6 +88,27 @@ export class ProjectsRouter {
       input.userId,
       input.text,
       input.vertex,
+    );
+  }
+
+  @Mutation({ input: editAnnotationSchema })
+  async editAnnotation(@Input() input: z.infer<typeof editAnnotationSchema>) {
+    return this.projectService.editAnnotation(
+      input.projectId,
+      input.annotationId,
+      input.text,
+      input.userId,
+    );
+  }
+
+  @Mutation({ input: deleteAnnotationSchema })
+  async deleteAnnotation(
+    @Input() input: z.infer<typeof deleteAnnotationSchema>,
+  ) {
+    return this.projectService.deleteAnnotation(
+      input.projectId,
+      input.annotationId,
+      input.userId,
     );
   }
 

@@ -30,11 +30,15 @@ export const UserIdProvider = ({
   children,
 }: PropsWithChildren): JSX.Element => {
   const [userId, setUserId] = useState<string | undefined>(() => {
-    return localStorage.getItem(USER_ID_STORAGE_KEY) ?? undefined;
+    if (typeof window !== "undefined") {
+      return window?.localStorage?.getItem(USER_ID_STORAGE_KEY) ?? undefined;
+    }
   });
 
   const [userName, setUserName] = useState<string | undefined>(() => {
-    return localStorage.getItem(USER_NAME_STORAGE_KEY) ?? undefined;
+    if (typeof window !== "undefined") {
+      return window?.localStorage?.getItem(USER_NAME_STORAGE_KEY) ?? undefined;
+    }
   });
 
   const { updateName } = useUserSocket({
