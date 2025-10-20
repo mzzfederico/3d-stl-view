@@ -5,6 +5,7 @@ import { TRPCProvider } from "@/lib/trpc/Provider";
 import { ModalProvider } from "@/lib/context/ModalContext";
 import { UserIdProvider } from "@/lib/context/UserContext";
 import UserNameCheck from "@/components/UserNameCheck";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +37,7 @@ export default function RootLayout({
             <ModalProvider>
               <UserNameCheck />
               {children}
+              <Toaster />
             </ModalProvider>
           </UserIdProvider>
         </TRPCProvider>

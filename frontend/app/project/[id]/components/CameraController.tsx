@@ -1,16 +1,10 @@
 "use client";
 
 import { PerspectiveCamera } from "@react-three/drei";
-import { useEffect, useMemo } from "react";
-import { useThree } from "@react-three/fiber";
+import { useMemo } from "react";
 import { vec3, euler } from "@/lib/three-utils";
 import { useProjectData } from "@/lib/hooks/useProjectData";
 import { useParams } from "next/navigation";
-
-interface CameraControllerProps {
-  position: { x: number; y: number; z: number };
-  rotation: { x: number; y: number; z: number };
-}
 
 export function CameraController() {
   const { id: projectId } = useParams<{ id: string }>();

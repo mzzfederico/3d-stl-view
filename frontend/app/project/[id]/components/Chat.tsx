@@ -16,7 +16,7 @@ export default function Chat({ onClose }: ChatProps) {
   const router = useRouter();
   const { id: projectId } = useParams<{ id: string }>();
 
-  const { project, query } = useProjectData(projectId);
+  const { project } = useProjectData(projectId);
   const { userId } = useUserContext();
   const { sendMessage } = useChatMessage(projectId);
   const [message, setMessage] = useState("");

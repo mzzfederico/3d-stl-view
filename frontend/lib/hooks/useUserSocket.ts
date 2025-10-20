@@ -32,7 +32,7 @@ export function useUserSocket({
         socket.emit("setUserName", { userId, userName: name });
       }
     },
-    [socket, userId],
+    [socket, userId, setUserName],
   );
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export function useUserSocket({
     return () => {
       newSocket.disconnect();
     };
-  }, []);
+  }, [setUserId, userId]);
 
   return { updateName };
 }

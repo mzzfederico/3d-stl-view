@@ -30,7 +30,7 @@ export class ProjectGateway
     this.eventsService.on('projectUpdate', (event: ProjectUpdateEvent) => {
       Logger.log(`Project ${event.projectId} updated by user ${event.userId}`);
 
-      this.server
+      void this.server
         .in(`project:${event.projectId}`)
         .fetchSockets()
         .then((sockets) => {

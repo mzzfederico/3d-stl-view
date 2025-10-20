@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { BaseModalProps } from "@/lib/types/modal";
+import { useToast } from "@/hooks/use-toast";
 
 export interface CreateProjectModalProps extends BaseModalProps {
   onSuccess: (projectId: string) => void;
@@ -25,6 +26,7 @@ export default function CreateProjectModal({
 }: CreateProjectModalProps) {
   const router = useRouter();
   const [projectTitle, setProjectTitle] = useState("");
+  const { toast } = useToast();
 
   const utils = trpc.useUtils();
   const createProject = trpc.projects.create.useMutation({
@@ -32,9 +34,21 @@ export default function CreateProjectModal({
       setProjectTitle("");
       // Invalidate projects list to refresh the table
       utils.projects.list.invalidate();
+      // Show success toast
+      toast({
+        title: "Project created!",
+        description: `"${projectTitle}" has been successfully created.`,
+      });
       // Notify parent and navigate
       onSuccess(data.projectId);
       router.push(`/project/${data.projectId}`);
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to create project",
+        description: error.message || "Could not create project. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 

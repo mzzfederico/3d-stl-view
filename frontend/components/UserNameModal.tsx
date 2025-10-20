@@ -47,11 +47,6 @@ export default function UserNameModal({
     });
   };
 
-  const closeModal = useCallback(() => {
-    if (canDismiss) {
-      setOpen(false);
-    }
-  }, [canDismiss, setOpen]);
 
   const handleSubmit = useCallback(() => {
     const finalName = name.trim() || generateRandomName();

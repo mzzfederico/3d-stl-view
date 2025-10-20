@@ -32,7 +32,7 @@ export function useUserId(): string | null {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [userId]);
 
   return userId;
 }

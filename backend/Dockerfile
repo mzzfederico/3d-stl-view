@@ -1,21 +1,26 @@
-FROM node:20-alpine
+# Use the official Node.js image as the base image
+FROM node:20
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Set the working directory inside the container
+WORKDIR /usr/src/app
 
-WORKDIR /app
+# Copy package.json and package-lock.json to the working directory
+COPY package*.json ./
 
-# Copy package files
-COPY package.json pnpm-lock.yaml ./
+# Install the application dependencies
+RUN corepack enable pnpm
+RUN pnpm add @nestjs/cli
+RUN pnpm i
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
-
-# Copy source code
+# Copy the rest of the application files
 COPY . .
 
-# Expose port
-EXPOSE 3000
+# Build the NestJS application
+RUN pnpm run build
 
-# Start in development mode (overridden by docker-compose)
-CMD ["pnpm", "run", "start:dev"]
+ENV NODE_ENV=production
+# Expose the application port
+EXPOSE 3001
+
+# Command to run the application
+CMD ["pnpm", "start"]

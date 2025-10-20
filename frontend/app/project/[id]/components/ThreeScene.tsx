@@ -1,8 +1,7 @@
 "use client";
 
 import { useProjectData } from "@/lib/hooks/useProjectData";
-import { Project } from "@backend/schemas/project.schema";
-import { Grid, OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import { Grid, OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,7 +17,6 @@ import {
   HoveredAnnotation,
   CreatingAnnotation,
 } from "./annotations";
-import { vec3, euler } from "@/lib/three-utils";
 
 export default function ThreeScene() {
   const router = useRouter();

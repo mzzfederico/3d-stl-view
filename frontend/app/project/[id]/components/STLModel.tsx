@@ -1,5 +1,5 @@
-import { useRef, useEffect } from "react";
-import { Mesh, Euler, Vector3 } from "three";
+import { useRef } from "react";
+import { Mesh } from "three";
 import { useMouseNearbyVertices } from "../hooks/useMouseNearbyVertices";
 import useGeometryVertex from "../hooks/useGeometryVertex";
 import useConvertBinaryIntoGeometry from "../hooks/useConvertBinaryIntoGeometry";

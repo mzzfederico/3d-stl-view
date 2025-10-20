@@ -8,9 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { io, Socket } from "socket.io-client";
 import {
-  SOCKET_URL,
   USER_ID_STORAGE_KEY,
   USER_NAME_STORAGE_KEY,
 } from "../constants";

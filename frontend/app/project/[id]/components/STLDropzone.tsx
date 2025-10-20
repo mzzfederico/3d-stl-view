@@ -6,6 +6,7 @@ import { Project } from "@backend/schemas/project.schema";
 import { trpc } from "@/lib/trpc/client";
 import { match } from "ts-pattern";
 import { vec3 } from "@/lib/three-utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface STLDropzoneProps {
   projectId: Project["id"];
@@ -17,6 +18,7 @@ export default function STLDropzone({ projectId, hasSTL }: STLDropzoneProps) {
   const uploadSTLMutation = trpc.projects.uploadSTL.useMutation();
   const updateTransform = trpc.projects.updateModelTransform.useMutation();
   const [isDraggingFile, setIsDraggingFile] = useState(false);
+  const { toast } = useToast();
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -47,13 +49,23 @@ export default function STLDropzone({ projectId, hasSTL }: STLDropzoneProps) {
             });
 
             await utils.projects.get.invalidate({ projectId });
+
+            toast({
+              title: "Model uploaded!",
+              description: `${file.name} has been successfully uploaded.`,
+            });
           } catch (error) {
             console.error("Failed to upload STL:", error);
+            toast({
+              title: "Upload failed",
+              description: "Could not upload the STL file. Please try again.",
+              variant: "destructive",
+            });
           }
         }
       }
     },
-    [projectId, uploadSTLMutation, utils],
+    [projectId, uploadSTLMutation, updateTransform, utils, toast],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

@@ -8,6 +8,7 @@ import { Pencil, Check, X, Share } from "lucide-react";
 import { useUserContext } from "@/lib/context/UserContext";
 import { useParams } from "next/navigation";
 import { useProjectData } from "@/lib/hooks/useProjectData";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProjectTitle() {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +17,7 @@ export default function ProjectTitle() {
   const [title, setTitle] = useState(project.title);
   const { userId } = useUserContext();
   const utils = trpc.useUtils();
+  const { toast } = useToast();
 
   const updateTitleMutation = trpc.projects.updateTitle.useMutation({
     onSuccess: () => {
@@ -34,8 +36,20 @@ export default function ProjectTitle() {
     }
   };
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link copied!",
+        description: "Project link has been copied to clipboard.",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to copy",
+        description: "Could not copy link to clipboard.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleCancel = () => {

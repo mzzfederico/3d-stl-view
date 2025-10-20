@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { Mesh, Euler, Vector3, Matrix4, Quaternion } from "three";
 import { PivotControls } from "@react-three/drei";
 import { useModelTransformUpdate } from "../hooks/useModelTransformUpdate";
@@ -19,7 +19,6 @@ interface ModelTransformControllerProps {
 }
 
 export default function ModelTransformController({
-  meshRef,
   projectId,
   modelTransform,
   children,
