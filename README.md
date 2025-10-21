@@ -81,10 +81,9 @@ pnpm run lint            # ESLint
 - **UI Components**: shadcn/ui components
 - **3D Rendering**: React Three Fiber for STL model viewing with PivotControls for model transformation
 - **Mode System**: Context-based mode switching between Transform and Note modes
-- **Key Pages**:
-  - `/login` - Name-only authentication
-  - `/projects` - List all projects
-  - `/project/[id]` - Project viewer with 3D scene and chat sidebar
+
+- `/projects` - List all projects
+- `/project/[id]` - Project viewer with 3D scene and chat sidebar
 
 ### Backend Structure
 
@@ -163,9 +162,7 @@ The application implements a persistent user identification system for collabora
 
 **Event Filtering:**
 - Backend tracks which user triggered each update (chat, camera, transformations)
-- WebSocket broadcasts filtered to exclude the triggering user
-- Prevents users from receiving duplicate updates for their own actions
-- Improves UX by avoiding unnecessary re-renders and flashing
+- Users only elaborate on events when not in background (doesn't annoy user on main window)
 
 **Implementation:**
 - `UserGateway`: WebSocket gateway for user identification and name registration
